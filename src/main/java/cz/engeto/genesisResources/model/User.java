@@ -1,16 +1,29 @@
-package model;
+package cz.engeto.genesisResources.model;
+
 
 public class User {
     private Long id;
     private String name;
     private String surname;
-    private String personID;
+    private String personid;
+    private String uuid;
 
-    public User(Long id, String name, String surname, String personID) {
+    public User(){
+
+    }
+
+    public User(Long id, String name, String surname, String personID, String Uuid) {
         this.id = id;
         this.name = name;
         this.surname = surname;
-        this.personID = personID;
+        this.personid = personID;
+        this.uuid = Uuid;
+    }
+
+    public User(Long id,String name, String surname){
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
     }
 
     public Long getId() {
@@ -38,10 +51,19 @@ public class User {
     }
 
     public String getPersonID() {
-        return personID;
+        return personid;
     }
 
     public void setPersonID(String personID) {
-        this.personID = personID;
+        this.personid = personID;
     }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
 }

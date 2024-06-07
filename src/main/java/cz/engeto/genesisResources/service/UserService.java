@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+//////////////////////////////// DISCORD JMÉNO: David S //////////////////////////////////////////////
+
 @Service
 public class UserService {
     private static final String connectionString = "jdbc:mysql://localhost:3306/genesisresources";

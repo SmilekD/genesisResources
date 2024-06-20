@@ -1,4 +1,4 @@
-package cz.engeto.genesisResources.settings;
+package cz.engeto.genesisresources.settings;
 
 import java.net.URL;
 

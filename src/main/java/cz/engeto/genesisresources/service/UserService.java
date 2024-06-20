@@ -1,7 +1,7 @@
-package cz.engeto.genesisResources.service;
+package cz.engeto.genesisresources.service;
 
-import cz.engeto.genesisResources.model.User;
-import cz.engeto.genesisResources.settings.Settings;
+import cz.engeto.genesisresources.model.User;
+import cz.engeto.genesisresources.settings.Settings;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -17,57 +17,63 @@ import java.util.UUID;
 
 @Service
 public class UserService {
-    private static final String connectionString = "jdbc:mysql://localhost:3306/genesisresources";
+    private static final String CONNECTION_STRING = "jdbc:mysql://localhost:3306/genesisresources";
 
-    Connection connection = DriverManager.getConnection(connectionString,"root","Smilda290402");
+    Connection connection = DriverManager.getConnection(CONNECTION_STRING,"root","Smilda290402");
 
     Statement statement = connection.createStatement();
 
     public UserService() throws SQLException {
     }
 
-    public void createUser(User user) throws SQLException{
-        String personId = generateUniquePersonID();
+    public boolean createUser(User user) {
         String uuid = UUID.randomUUID().toString();
-      statement.execute("INSERT INTO users (Name, Surname, PersonID, Uuid) VALUES('"+user.getName()+"','"
-              +user.getSurname()+"','"
-              +personId+"','"
-              +uuid+"')");
+
+        try {
+            if (!isPersonIdValidAndAvailable(user.getPersonID())) {
+                return false;
+            }
+
+            int num = statement.executeUpdate("INSERT INTO users (Name, Surname, PersonID, Uuid) VALUES('"
+                    + user.getName() + "','"
+                    + user.getSurname() + "','"
+                    + user.getPersonID() + "','"
+                    + uuid + "')");
+
+            return num > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private List<String> loadAvailablePersonIDs() {
-        List<String> availablePersonIDs = new ArrayList<>();
+    private boolean isPersonIdValidAndAvailable(String personID) {
+        List<String> availablePersonIds = new ArrayList<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader(Settings.getPersonid()))) {
             String line;
             while ((line = br.readLine()) != null) {
-                availablePersonIDs.add(line);
+                availablePersonIds.add(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return availablePersonIDs;
-    }
 
-    private List<String> getAllPersonIDs() throws SQLException {
-        ResultSet resultSet;
-        List<String> personIDs = new ArrayList<>();
-        resultSet = statement.executeQuery("SELECT PersonID FROM users");
-        while (resultSet.next()) {
-            personIDs.add(resultSet.getString("PersonID"));
+        if (!availablePersonIds.contains(personID)) {
+            return false;
         }
-        return personIDs;
-    }
 
-    private String generateUniquePersonID() throws SQLException {
-        List<String> existingPersonIDs = getAllPersonIDs();
-        List<String> availablePersonIDs = loadAvailablePersonIDs();
-        for (String personID : existingPersonIDs) {
-            availablePersonIDs.remove(personID);
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS count FROM users WHERE PersonID = '" + personID + "'");
+            if (resultSet.next() && resultSet.getInt("count") > 0) {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
-        if (availablePersonIDs.isEmpty()) {
-            throw new SQLException("No single person ID.");
-        }
-        return availablePersonIDs.get(0);
+
+        return true;
     }
 
     public User getUserById(int id) throws SQLException{
@@ -130,15 +136,17 @@ public class UserService {
         return userList;
     }
 
-    public void updateUser(User user) throws SQLException {
-        statement.execute("UPDATE users SET Name = '"
+    public boolean updateUser(User user) throws SQLException {
+        int num = statement.executeUpdate("UPDATE users SET Name = '"
                 + user.getName() + "', Surname = '"
                 + user.getSurname() + "' WHERE ID = "
                 + user.getId());
+        return num >0;
     }
 
-    public void deleteUserById(int id) throws SQLException{
-        statement.executeUpdate("DELETE FROM users WHERE ID = "+id);
+    public boolean deleteUserById(int id) throws SQLException{
+        int num =statement.executeUpdate("DELETE FROM users WHERE ID = "+id);
+        return num>0;
     }
 
 }

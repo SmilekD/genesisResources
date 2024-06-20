@@ -1,11 +1,11 @@
-package cz.engeto.genesisResources.model;
+package cz.engeto.genesisresources.model;
 
 
 public class User {
     private Long id;
     private String name;
     private String surname;
-    private String personid;
+    private String personId;
     private String uuid;
 
     public User(){
@@ -16,7 +16,7 @@ public class User {
         this.id = id;
         this.name = name;
         this.surname = surname;
-        this.personid = personID;
+        this.personId = personID;
         this.uuid = Uuid;
     }
 
@@ -51,11 +51,11 @@ public class User {
     }
 
     public String getPersonID() {
-        return personid;
+        return personId;
     }
 
     public void setPersonID(String personID) {
-        this.personid = personID;
+        this.personId = personID;
     }
 
     public String getUuid() {
